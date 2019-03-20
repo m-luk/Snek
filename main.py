@@ -22,7 +22,7 @@ class position:
         self.x = cord[0]
         self.y = cord[1]
     def get_cord(self):
-        return (self.x, self.y)
+        return [self.x, self.y]
     def move_by_vector(self, vec, multi):
         self.last_pos = (self.x, self.y)
         self.x += vec[0]*multi
@@ -41,10 +41,13 @@ class square(position):
 
 class snek:
     def __init__(self):
-        #create snek body consiting of 3 squares from center point to the left
         assert(WINDOWHEIGHT%SQR_SIZE==0 and WINDOWWIDTH%SQR_SIZE==0)
+
+        #body creation
         self.body = [square(WINDOWWIDTH/2-i*SQR_SIZE, WINDOWHEIGHT/2, SQR_SIZE) for i in range(10)]
-        print([val.get_cord() for val in self.body])
+
+        #print([val.get_cord() for val in self.body])
+
         self.head = self.body[0].get_cord()
         #movement 2d vector
         self.direction = (1,0)
@@ -64,15 +67,21 @@ class snek:
     def update_pos(self):
         """updates snek position, if direction change is provided (as a vector (dx, dy)) it changes the dir"""
 
-        #TODO: when snek exits
         #print(self.body[0].get_cord())
         print(self.body)
 
         last_node=None
 
+        #TODO: cos nie tak z przenoszeniem w lewo
+
         for node in self.body:
             if node == self.body[0]:
                 node.move_by_vector(self.direction, MOVEMENT_STEP)
+                if node.get_cord()[0]> WINDOWWIDTH:
+                    node.set_cord([0, node.get_cord()[1]])
+                elif node.get_cord()[0] <0:
+                    node.set_cord([WINDOWWIDTH, node.get_cord()[1]])
+
             else:
                 node.set_cord(last_node.last_pos)
             last_node = node
