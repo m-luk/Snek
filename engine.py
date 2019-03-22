@@ -7,9 +7,8 @@
 
 import pygame
 from config import *
-from engine import *
 from ui import *
-from random import randint
+from random import randint, randrange
 
 class position:
     def __init__(self, x, y):
@@ -26,6 +25,9 @@ class position:
 
     def get_cord(self):
         return [self.x, self.y]
+
+    def get_last_cord(self):
+        return self.last_pos
 
     def move_by_vector(self, vec, multi, save_last=True):
         if save_last:
@@ -46,8 +48,31 @@ class square(position):
     def gett(self):
         return pygame.Rect(self.x, self.y, self.a, self.a)
 
+    def get_color(self):
+        return self.color
+
     def __repr__(self):
         return "square at ({},{})".format(self.x, self.y)
+
+
+class food(square):
+    def __init__(self, snek: object):
+        loop = True
+
+        while loop:
+            loop = False
+            self.x = randrange(0, WINDOWWIDTH, SQR_SIZE)
+            self.y = randrange(0, WINDOWHEIGHT, SQR_SIZE)
+            for node in snek.get_snek():
+                if node.get_cord() == (self.x, self.y):
+                    loop = True
+                    break
+
+        square.__init__(self, self.x, self.y, SQR_SIZE, WHITE)
+
+
+    def __repr__(self):
+        return "food at ({},{})".format(self.x, self.y)
 
 
 class snek:
@@ -55,13 +80,12 @@ class snek:
         assert (WINDOWHEIGHT % SQR_SIZE == 0 and WINDOWWIDTH % SQR_SIZE == 0)
 
         # body creation
-        self.body = [square(WINDOWWIDTH / 2 - i * SQR_SIZE, WINDOWHEIGHT / 2, SQR_SIZE) for i in range(10)]
+        self.body = [square(WINDOWWIDTH / 2 - i * SQR_SIZE, WINDOWHEIGHT / 2, SQR_SIZE, GREEN) for i in range(10)]
 
         # print([val.get_cord() for val in self.body])
 
-        self.head_cord = self.body[0].get_cord()
-        # movement 2d vector
-        self.direction = (1, 0)
+        self.head_cord = self.body[0].get_cord()    # head position
+        self.direction = (1, 0)                     # movement 2d vector
 
     def __len__(self):
         return len(self.body)
@@ -69,6 +93,7 @@ class snek:
     def set_direction(self, vec):
         assert (-1 <= vec[0] <= 1 and -1 <= vec[1] <= 1)
 
+        #dont allow snake running back and forth
         if not vec == tuple([i * (-1) for i in self.direction]):
             self.direction = vec
 
@@ -82,7 +107,7 @@ class snek:
         """updates snek position, if direction change is provided (as a vector (dx, dy)) it changes the dir"""
 
         # print(self.body[0].get_cord())
-        #print(self.body)
+        # print(self.body)
 
         last_node = None
 
@@ -118,3 +143,14 @@ class snek:
                 return True
 
         return False
+
+    def if_eats(self, food):
+
+            if food.get_cord() == self.head_cord:
+                pend_node = self.body[-1].get_last_cord()
+                self.body.append(square(pend_node[0], pend_node[1], SQR_SIZE, GREEN))
+
+                return True
+            else:
+                return False
+

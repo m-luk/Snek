@@ -23,6 +23,12 @@ class menu:
         self.title = title
         self.list_items = list_items
 
+    def show_menu(self):
+        """displays menu"""
+        #TODO:
+        pass
+
+
 
 
 

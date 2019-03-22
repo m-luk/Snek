@@ -11,7 +11,7 @@ class App:
         self.screen = None
         self.snek = None
         self.new_game = True
-        self.font = "snake_chan.ttf"
+        self.font = FONT_1
 
     def on_start(self):
         pygame.init()
@@ -19,14 +19,14 @@ class App:
 
     def on_new_game(self):
         self.run = True
-        self.food_is = False
         self.snek = snek()
+        self.food = food(self.snek)
         self.new_game = False
 
     def on_event(self, event):
-        if event.type == pygame.QUIT:
+        if event.type == pygame.QUIT:       # for quitting
             self.run = False
-        if event.type == pygame.KEYDOWN:
+        elif event.type == pygame.KEYDOWN:  # keyboard shortcut for quitting
             if event.key == pygame.K_q:
                 self.run = False
                 return
@@ -90,8 +90,13 @@ class App:
 
         self.snek.update_pos()
 
+        if self.snek.if_eats(self.food):
+            self.food = food(self.snek)
+
         for node in self.snek.get_snek():
-            pygame.draw.rect(self.screen, WHITE, node.gett())
+            pygame.draw.rect(self.screen, node.get_color(), node.gett())
+
+        pygame.draw.rect(self.screen, self.food.get_color(), self.food.gett())
 
 
         CLOCK.tick(FPS)
