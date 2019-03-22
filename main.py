@@ -9,6 +9,7 @@ SQR_SIZE = 10
 
 WHITE = (255, 255, 255)
 RED = (255, 0, 0)
+BLACK = (0,0,0)
 
 CLOCK = pygame.time.Clock()
 
@@ -129,6 +130,7 @@ class App:
         self.screen = None
         self.snek = None
         self.new_game = True
+        self.font = "snake_chan.ttf"
 
     def on_start(self):
         pygame.init()
@@ -143,24 +145,65 @@ class App:
     def on_event(self, event):
         if event.type == pygame.QUIT:
             self.run = False
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_q:
+                self.run = False
+                return
+
+    def format_text(self, msg, font, text_size, text_color):
+        new_font = pygame.font.Font(font, text_size)
+        new_text = new_font.render(msg, 0, text_color)
+
+        return new_text
 
     def on_crash(self):
         """handles crashesh with obstacles and canibalism"""
-        print("Wanna play again? Press [Y], no interested? [Q] is for u")
-        while self.run:
+
+        self.screen.fill(BLACK)
+
+        menu = True
+        chs = "respawn"
+
+        while menu:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self.run = False
+                    return
                 elif event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_y:
-                        self.new_game = True
-                        return
-                    elif event.key == pygame.K_q:
-                        self.run = False
-                        return
+                    if event.key == pygame.K_UP:
+                        chs = "respawn"
+                    elif event.key == pygame.K_DOWN:
+                        chs = "quit"
+                    elif event.key == pygame.K_RETURN:
+                        if chs == "respawn":
+                            self.new_game = True
+                            return
+                        elif chs == "quit":
+                            self.run=False
+                            return
+
+            self.screen.fill(BLACK)
+
+            if chs == "respawn":
+                text_resp = self.format_text("RESPAWN", self.font, 30, RED)
+            else:
+                text_resp = self.format_text("RESPAWN", self.font, 30, WHITE)
+            if chs == "quit":
+                text_quit = self.format_text("QUIT", self.font, 30, RED)
+            else:
+                text_quit = self.format_text("QUIT", self.font, 30, WHITE)
+
+            resp_square = text_resp.get_rect()
+            quit_square = text_quit.get_rect()
+
+            self.screen.blit(text_resp, (WINDOWWIDTH/2-resp_square[2]/2, 160))
+            self.screen.blit(text_quit, (WINDOWWIDTH/2-quit_square[2]/2, 190))
+
+            pygame.display.update()
+            CLOCK.tick(FPS)
 
     def on_loop(self):
-        self.screen.fill((0, 0, 0))
+        self.screen.fill(BLACK)
 
         # print(self.p1.get_cord())
         # mechanics
