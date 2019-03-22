@@ -61,7 +61,7 @@ class snek:
 
         # print([val.get_cord() for val in self.body])
 
-        self.head = self.body[0].get_cord()
+        self.head_cord = self.body[0].get_cord()
         # movement 2d vector
         self.direction = (1, 0)
 
@@ -77,11 +77,14 @@ class snek:
     def get_direction(self):
         return self.direction
 
+    def get_snek(self):
+        return self.body
+
     def update_pos(self):
         """updates snek position, if direction change is provided (as a vector (dx, dy)) it changes the dir"""
 
         # print(self.body[0].get_cord())
-        print(self.body)
+        #print(self.body)
 
         last_node = None
 
@@ -103,13 +106,21 @@ class snek:
                 elif node.get_cord()[1] < 0:
                     node.set_cord([node.get_cord()[0], WINDOWHEIGHT-SQR_SIZE], False)
 
+                self.head_cord = node.get_cord()
+
             else:
                 node.set_cord(last_node.last_pos)
 
             last_node = node  # save position of the last node
 
-    def get_snek(self):
-        return self.body
+    def is_canibal(self):
+        """checks if snake is eating himself"""
+        for node in self.body[1::]:
+            if node.get_cord() == self.head_cord:
+                return True
+
+        return False
+
 
 class App:
     def __init__(self):
@@ -117,18 +128,36 @@ class App:
         self.run = True
         self.screen = None
         self.snek = None
+        self.new_game = True
 
     def on_start(self):
         pygame.init()
         self.screen = pygame.display.set_mode(self.size)
 
+    def on_new_game(self):
         self.run = True
         self.food_is = False
         self.snek = snek()
+        self.new_game = False
 
     def on_event(self, event):
         if event.type == pygame.QUIT:
             self.run = False
+
+    def on_crash(self):
+        """handles crashesh with obstacles and canibalism"""
+        print("Wanna play again? Press [Y], no interested? [Q] is for u")
+        while self.run:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    self.run = False
+                elif event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_y:
+                        self.new_game = True
+                        return
+                    elif event.key == pygame.K_q:
+                        self.run = False
+                        return
 
     def on_loop(self):
         self.screen.fill((0, 0, 0))
@@ -146,6 +175,7 @@ class App:
         for node in self.snek.get_snek():
             pygame.draw.rect(self.screen, WHITE, node.gett())
 
+
         CLOCK.tick(FPS)
 
     def on_render(self):
@@ -162,11 +192,20 @@ class App:
         while self.run:
             for event in pygame.event.get():
                 self.on_event(event)
+
+            if self.new_game:
+                self.on_new_game()
+
             self.on_loop()
+            if self.snek.is_canibal():
+                self.on_crash()
+
             self.on_render()
+
         self.on_cleanup()
 
 
 if __name__ == "__main__":
     a1 = App()
     a1.on_run()
+
