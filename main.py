@@ -71,6 +71,8 @@ class App:
             resp_square = text_resp.get_rect()
             quit_square = text_quit.get_rect()
 
+            print(resp_square)
+
             self.screen.blit(text_resp, (WINDOWWIDTH/2-resp_square[2]/2, 160))
             self.screen.blit(text_quit, (WINDOWWIDTH/2-quit_square[2]/2, 190))
 
@@ -130,5 +132,7 @@ class App:
 
 if __name__ == "__main__":
     a1 = App()
-    a1.on_run()
+    # a1.on_run()
+
+    #temporary debug for UI
 
