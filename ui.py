@@ -23,8 +23,6 @@ class menu:
                  el_spacing = EL_SPACING, default_option=0):
 
         """
-        :param screen:
-
         :param colors:
             [0] - title color
             [1] - menu item inactive color
@@ -63,6 +61,9 @@ class menu:
         el_from_top_spacing = self.title_spacing + self.title_size + TITLE_SPACING
 
         #setup coordinates
+
+        #TODO: centralise elements vertically
+
         #   title
         title_cord = (WINDOWWIDTH / 2 - self.title_rect[2] / 2, self.title_spacing)
 
@@ -97,11 +98,12 @@ class menu:
         self.screen.fill(BLACK)
 
         for event in pygame.event.get():
-
-            #TODO: handle quiting
+            #quitting
+            if event.type == pygame.QUIT:
+                return -1
 
             #menu movement
-            if event.type == pygame.KEYDOWN:
+            elif event.type == pygame.KEYDOWN:
                 #move vertically
                 if event.key == pygame.K_UP:
                     if self.option > min_option:

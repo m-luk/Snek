@@ -28,19 +28,23 @@ class App:
         while main_menu:
             menu_choice = self.m1.menu_run()
             if menu_choice is not None:
-                if menu_choice==0:
-                    self.run = True
-                    main_menu = False
-                elif menu_choice==1:
-                    #TODO: leaderboard
-                    pass
-                elif menu_choice==2:
-                    #TODO: credits
-                    pass
-                elif menu_choice ==3:
-                    #quit
+
+                if menu_choice == -1 or menu_choice == 3:   #quit statement
                     main_menu = False
                     self.run = False
+
+                if menu_choice==0:      #new game
+                    self.run = True
+                    main_menu = False
+
+                elif menu_choice==1:    #leaderboard
+                    #TODO: leaderboard
+                    pass
+
+                elif menu_choice==2:    #credits
+                    #TODO: credits
+                    pass
+
             self.on_render()
 
     def on_new_game(self):
@@ -63,6 +67,8 @@ class App:
         m2 = menu(self.screen, "You Died", ["RESPAWN", "QUIT"])
 
         menu_run = True
+
+        #TODO: add option to go back to main menu
 
         while menu_run:
             choice = m2.menu_run()
