@@ -1,13 +1,14 @@
 import pygame
 from config import *
 from engine import *
+from ui import *
 from random import randint
 
 
 class App:
     def __init__(self):
         self.size = (WINDOWWIDTH, WINDOWHEIGHT)
-        self.run = True
+        self.run = False
         self.screen = None
         self.snek = None
         self.new_game = True
@@ -16,6 +17,31 @@ class App:
     def on_start(self):
         pygame.init()
         self.screen = pygame.display.set_mode(self.size)
+
+    def on_start_menu(self):
+        title = "S N E K"
+        menu_elements = ["New Game", "Leaderboard", "Credits", "Quit"]
+        self.m1 = menu(self.screen, title, menu_elements)
+
+        main_menu=True
+
+        while main_menu:
+            menu_choice = self.m1.menu_run()
+            if menu_choice is not None:
+                if menu_choice==0:
+                    self.run = True
+                    main_menu = False
+                elif menu_choice==1:
+                    #TODO: leaderboard
+                    pass
+                elif menu_choice==2:
+                    #TODO: credits
+                    pass
+                elif menu_choice ==3:
+                    #quit
+                    main_menu = False
+                    self.run = False
+            self.on_render()
 
     def on_new_game(self):
         self.run = True
@@ -32,50 +58,23 @@ class App:
                 return
 
     def on_crash(self):
-        """handles crashesh with obstacles and canibalism"""
+        """handles crashes with obstacles and cannibalism"""
 
-        self.screen.fill(BLACK)
+        m2 = menu(self.screen, "You Died", ["RESPAWN", "QUIT"])
 
-        menu = True
-        chs = "respawn"
+        menu_run = True
 
-        while menu:
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    self.run = False
-                    return
-                elif event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_UP:
-                        chs = "respawn"
-                    elif event.key == pygame.K_DOWN:
-                        chs = "quit"
-                    elif event.key == pygame.K_RETURN:
-                        if chs == "respawn":
-                            self.new_game = True
-                            return
-                        elif chs == "quit":
-                            self.run=False
-                            return
+        while menu_run:
+            choice = m2.menu_run()
+            if choice == 0:
+                self.new_game = True
+                menu_run = False
+            elif choice == 1:
+                self.run=False
+                menu_run = False
 
-            self.screen.fill(BLACK)
+            self.on_render()
 
-            if chs == "respawn":
-                text_resp = format_text("RESPAWN", self.font, 30, RED)
-            else:
-                text_resp = format_text("RESPAWN", self.font, 30, WHITE)
-            if chs == "quit":
-                text_quit = format_text("QUIT", self.font, 30, RED)
-            else:
-                text_quit = format_text("QUIT", self.font, 30, WHITE)
-
-            resp_square = text_resp.get_rect()
-            quit_square = text_quit.get_rect()
-
-            self.screen.blit(text_resp, (WINDOWWIDTH/2-resp_square[2]/2, 160))
-            self.screen.blit(text_quit, (WINDOWWIDTH/2-quit_square[2]/2, 190))
-
-            pygame.display.update()
-            CLOCK.tick(FPS)
 
     def on_loop(self):
         self.screen.fill(BLACK)
@@ -98,7 +97,6 @@ class App:
 
         pygame.draw.rect(self.screen, self.food.get_color(), self.food.gett())
 
-
         CLOCK.tick(FPS)
 
     def on_render(self):
@@ -111,8 +109,11 @@ class App:
         if self.on_start() == False:
             self.run = False
 
-        # runloop
+        self.on_start_menu()
+
+        # game runloop
         while self.run:
+
             for event in pygame.event.get():
                 self.on_event(event)
 
@@ -130,5 +131,8 @@ class App:
 
 if __name__ == "__main__":
     a1 = App()
+    a1.on_start()
     a1.on_run()
+
+
 
