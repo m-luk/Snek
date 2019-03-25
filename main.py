@@ -58,52 +58,23 @@ class App:
                 return
 
     def on_crash(self):
-        """handles crashesh with obstacles and canibalism"""
+        """handles crashes with obstacles and cannibalism"""
 
-        self.screen.fill(BLACK)
+        m2 = menu(self.screen, "You Died", ["RESPAWN", "QUIT"])
 
-        #TODO: convert menu to ui.py menu class
+        menu_run = True
 
-        menu = True
-        chs = "respawn"
+        while menu_run:
+            choice = m2.menu_run()
+            if choice == 0:
+                self.new_game = True
+                menu_run = False
+            elif choice == 1:
+                self.run=False
+                menu_run = False
 
-        while menu:
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    self.run = False
-                    return
-                elif event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_UP:
-                        chs = "respawn"
-                    elif event.key == pygame.K_DOWN:
-                        chs = "quit"
-                    elif event.key == pygame.K_RETURN:
-                        if chs == "respawn":
-                            self.new_game = True
-                            return
-                        elif chs == "quit":
-                            self.run=False
-                            return
+            self.on_render()
 
-            self.screen.fill(BLACK)
-
-            if chs == "respawn":
-                text_resp = format_text("RESPAWN", self.font, 30, RED)
-            else:
-                text_resp = format_text("RESPAWN", self.font, 30, WHITE)
-            if chs == "quit":
-                text_quit = format_text("QUIT", self.font, 30, RED)
-            else:
-                text_quit = format_text("QUIT", self.font, 30, WHITE)
-
-            resp_square = text_resp.get_rect()
-            quit_square = text_quit.get_rect()
-
-            self.screen.blit(text_resp, (WINDOWWIDTH/2-resp_square[2]/2, 160))
-            self.screen.blit(text_quit, (WINDOWWIDTH/2-quit_square[2]/2, 190))
-
-            pygame.display.update()
-            CLOCK.tick(FPS)
 
     def on_loop(self):
         self.screen.fill(BLACK)

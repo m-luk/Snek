@@ -41,7 +41,7 @@ class menu:
         self.el_list = el_list
 
         self.title_f = format_text(title, font, title_size, colors[0])
-        self.el_list_f = [format_text(el, font, title_size, colors[1]) for el in self.el_list]
+        self.el_list_f = [format_text(el, font, el_size, colors[1]) for el in self.el_list]
 
         self.title_size = title_size
         self.el_size = el_size
