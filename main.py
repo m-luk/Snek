@@ -132,7 +132,12 @@ class App:
 
 if __name__ == "__main__":
     a1 = App()
+    a1.on_start()
     # a1.on_run()
 
     #temporary debug for UI
+    m1 = menu(a1.screen, "Menu1", ["Choice 1", "Choice 2", "Choice 3"])
+    while True:
+        m1.menu_run()
+        a1.on_render()
 

@@ -18,17 +18,30 @@ def format_text(msg, font, text_size, text_color):
 class menu:
     """menu template"""
 
-    def __init__(self, screen, title = None, el_list = None, font = DEF_FONT, title_size=M_TITLE_SIZE, el_size = M_EL_SIZE, \
-                 colors=None, title_spacing = TITLE_SPACING, el_spacing = EL_SPACING):
+    def __init__(self, screen, title = None, el_list = None, font = FONT_1, title_size=M_TITLE_SIZE, el_size = M_EL_SIZE, \
+                 colors=(MENU_TITLE_COLOR, MENU_INACTIVE_COLOR, MENU_ACTIVE_COLOR), title_spacing = TITLE_SPACING, \
+                 el_spacing = EL_SPACING, default_option=0):
 
-        assert title_size>= WINDOWHEIGHT, "Title text to large to be rendered"
-        assert (el_size * len(el_list) + el_spacing * (len(el_list)-1) + title_size + title_spacing) > WINDOWHEIGHT, \
+        """
+        :param screen:
+
+        :param colors:
+            [0] - title color
+            [1] - menu item inactive color
+            [2] - menu item active color
+        """
+
+        assert title_size<=WINDOWHEIGHT, "Title text to large to be rendered"
+        assert (el_size * len(el_list) + el_spacing * (len(el_list)-1) + title_size + title_spacing) < WINDOWHEIGHT, \
         "text is too large to render it"
 
         self.screen = screen
 
-        self.title = format_text(font, title, title_size, title, colors[0])
-        self.el_list = [format_text(font, el, el_size, colors[1]) for el in el_list ]
+        self.title = title
+        self.el_list = el_list
+
+        self.title_f = format_text(title, font, title_size, colors[0])
+        self.el_list_f = [format_text(el, font, title_size, colors[1]) for el in self.el_list]
 
         self.title_size = title_size
         self.el_size = el_size
@@ -36,16 +49,16 @@ class menu:
         self.title_spacing = title_spacing
         self.el_spacing = el_spacing
 
-        self.title_rect = self.title.get_rect()
-        self.el_rects = [el.get_rect() for el in self.el_list]
+        self.title_rect = self.title_f.get_rect()
+        self.el_rects = [el.get_rect() for el in self.el_list_f]
 
         self.font = font
+        self.colors = colors
 
-        self.title_color = colors[0]
-        self.el_colors = [colors[1] for el in el_list]
+        self.option = default_option
 
     def show_menu(self):
-        """displays menu"""
+        """setups and displays menu"""
 
         el_from_top_spacing = self.title_spacing + self.title_size + TITLE_SPACING
 
@@ -55,26 +68,59 @@ class menu:
 
         #   elements
         el_cords = [(WINDOWWIDTH / 2 - self.el_rects[i][2] / 2, el_from_top_spacing + i * (self.el_rects[i][3] + self.el_spacing)) for i
-                    in range(len(self.el_list))]
+                    in range(len(self.el_list_f))]
+
+        #setup texts
+        #   title
+        self.title_f = format_text(self.title, self.font, self.title_size, self.colors[0])
+
+        #   elements
+        self.el_list_f = [format_text(el, self.font, self.el_size, self.colors[1]) for el in self.el_list]              #inactive
+        self.el_list_f[self.option] = format_text(self.el_list[self.option],self.font, self.el_size, self.colors[2])    #active
 
         #render
         #   title
-        self.screen.blit(self.title, title_cord)
+        self.screen.blit(self.title_f, title_cord)
 
         #   elements
-        for el_id in len(self.el_list):
-            self.screen.blit(self.el_list[el_id], el_cords[el_id])
+        for el_id in range(len(self.el_list)):
+            self.screen.blit(self.el_list_f[el_id], el_cords[el_id])
+
 
     def menu_run(self):
         run = True
 
-        option = 0
+        min_option = 0
+        max_option = len(self.el_list)-1
 
         #options:
         # [0] - start new game
         # [1] - check leaderboard
         # [2] - credits
         # [3] - quit
+
+
+        self.screen.fill(BLACK)
+
+        for event in pygame.event.get():
+
+            #TODO: handle quiting
+
+            #menu movement
+            if event.type == pygame.KEYDOWN:
+                #move vertically
+                if event.key == pygame.K_UP:
+                    if self.option > min_option:
+                        self.option -= 1
+                elif event.key == pygame.K_DOWN:
+                    if self.option < max_option:
+                        self.option += 1
+                elif event.key == pygame.K_RETURN:
+                    return self.option
+
+        self.show_menu()
+        CLOCK.tick(MENU_FPS)
+
 
 
 
