@@ -18,7 +18,7 @@ def format_text(msg, font, text_size, text_color):
 class menu:
     """menu template"""
 
-    def __init__(self, screen, title = None, el_list = None, font = FONT_1, title_size=M_TITLE_SIZE, el_size = M_EL_SIZE, \
+    def __init__(self, screen, title = None, el_list = None, font = DEF_FONT, title_size=M_TITLE_SIZE, el_size = M_EL_SIZE, \
                  colors=(MENU_TITLE_COLOR, MENU_INACTIVE_COLOR, MENU_ACTIVE_COLOR), title_spacing = TITLE_SPACING, \
                  el_spacing = EL_SPACING, default_option=0):
 
@@ -88,17 +88,11 @@ class menu:
 
 
     def menu_run(self):
-        run = True
+        """Menu item choosing mechanism"""
 
+        #option boundaries
         min_option = 0
         max_option = len(self.el_list)-1
-
-        #options:
-        # [0] - start new game
-        # [1] - check leaderboard
-        # [2] - credits
-        # [3] - quit
-
 
         self.screen.fill(BLACK)
 
@@ -118,8 +112,13 @@ class menu:
                 elif event.key == pygame.K_RETURN:
                     return self.option
 
+
         self.show_menu()
+
         CLOCK.tick(MENU_FPS)
+
+        return None
+
 
 
 

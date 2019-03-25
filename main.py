@@ -1,13 +1,14 @@
 import pygame
 from config import *
 from engine import *
+from ui import *
 from random import randint
 
 
 class App:
     def __init__(self):
         self.size = (WINDOWWIDTH, WINDOWHEIGHT)
-        self.run = True
+        self.run = False
         self.screen = None
         self.snek = None
         self.new_game = True
@@ -16,6 +17,31 @@ class App:
     def on_start(self):
         pygame.init()
         self.screen = pygame.display.set_mode(self.size)
+
+    def on_start_menu(self):
+        title = "S N E K"
+        menu_elements = ["New Game", "Leaderboard", "Credits", "Quit"]
+        self.m1 = menu(self.screen, title, menu_elements)
+
+        main_menu=True
+
+        while main_menu:
+            menu_choice = self.m1.menu_run()
+            if menu_choice is not None:
+                if menu_choice==0:
+                    self.run = True
+                    main_menu = False
+                elif menu_choice==1:
+                    #TODO: leaderboard
+                    pass
+                elif menu_choice==2:
+                    #TODO: credits
+                    pass
+                elif menu_choice ==3:
+                    #quit
+                    main_menu = False
+                    self.run = False
+            self.on_render()
 
     def on_new_game(self):
         self.run = True
@@ -35,6 +61,8 @@ class App:
         """handles crashesh with obstacles and canibalism"""
 
         self.screen.fill(BLACK)
+
+        #TODO: convert menu to ui.py menu class
 
         menu = True
         chs = "respawn"
@@ -71,8 +99,6 @@ class App:
             resp_square = text_resp.get_rect()
             quit_square = text_quit.get_rect()
 
-            print(resp_square)
-
             self.screen.blit(text_resp, (WINDOWWIDTH/2-resp_square[2]/2, 160))
             self.screen.blit(text_quit, (WINDOWWIDTH/2-quit_square[2]/2, 190))
 
@@ -100,7 +126,6 @@ class App:
 
         pygame.draw.rect(self.screen, self.food.get_color(), self.food.gett())
 
-
         CLOCK.tick(FPS)
 
     def on_render(self):
@@ -113,8 +138,11 @@ class App:
         if self.on_start() == False:
             self.run = False
 
-        # runloop
+        self.on_start_menu()
+
+        # game runloop
         while self.run:
+
             for event in pygame.event.get():
                 self.on_event(event)
 
@@ -133,11 +161,7 @@ class App:
 if __name__ == "__main__":
     a1 = App()
     a1.on_start()
-    # a1.on_run()
+    a1.on_run()
 
-    #temporary debug for UI
-    m1 = menu(a1.screen, "Menu1", ["Choice 1", "Choice 2", "Choice 3"])
-    while True:
-        m1.menu_run()
-        a1.on_render()
+
 
