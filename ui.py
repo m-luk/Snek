@@ -114,12 +114,58 @@ class menu:
                 elif event.key == pygame.K_RETURN:
                     return self.option
 
-
         self.show_menu()
 
         CLOCK.tick(MENU_FPS)
 
         return None
+
+
+class score_display:
+
+    def __init__(self,screen, snek, placement="top_right", font=S_D_FONT, font_size = S_D_TEXT_SIZE, color = S_D_COLOR):
+        """
+        :param placement:
+            top_right
+            top_left
+            low_right
+            low_left
+        """
+        self.screen = screen
+        self.font = font
+        self.font_size = font_size
+        self.color = color
+        self.snek = snek
+        self.placement = placement
+
+    def change_color(self, color):
+        self.color = color
+
+    def change_placement(self, placement):
+        self.placement = placement
+
+    def show_sd(self):
+
+        #get snek lenght
+        points = len(self.snek)-SNEK_START_SIZE
+
+        points_text = format_text(str(points), self.font, self.font_size, self.color)
+
+        points_text_rect = points_text.get_rect()
+
+        points_cord = [0,0]
+
+        #set coordinates
+        if self.placement == "top_right":
+            points_cord = [WINDOWWIDTH-points_text_rect[2], 0]
+        elif self.placement == "top_left":
+            points_cord = [0,0]
+        elif self.placement == "low_right":
+            points_cord = [WINDOWWIDTH-points_text_rect[2], WINDOWHEIGHT-points_text_rect[3]]
+        elif self.placement =="low_left":
+            points_cord = [0, WINDOWHEIGHT-points_text_rect[3]]
+
+        self.screen.blit(points_text, points_cord)
 
 
 

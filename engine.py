@@ -80,7 +80,7 @@ class snek:
         assert (WINDOWHEIGHT % SQR_SIZE == 0 and WINDOWWIDTH % SQR_SIZE == 0)
 
         # body creation
-        self.body = [square(WINDOWWIDTH / 2 - i * SQR_SIZE, WINDOWHEIGHT / 2, SQR_SIZE, GREEN) for i in range(10)]
+        self.body = [square(WINDOWWIDTH / 2 - i * SQR_SIZE, WINDOWHEIGHT / 2, SQR_SIZE, GREEN) for i in range(SNEK_START_SIZE)]
 
         # print([val.get_cord() for val in self.body])
 
