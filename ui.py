@@ -145,6 +145,14 @@ class score_display:
 
         if self.placement == "top_right":
             points_cord = [WINDOWWIDTH-points_text_rect[2], 0]
+        elif self.placement == "top_left":
+            points_cord = [0,0]
+        elif self.placement == "low_right":
+            points_cord = [WINDOWWIDTH-points_text_rect[2], WINDOWHEIGHT-points_text_rect[3]]
+        elif self.placement =="low_left":
+            points_cord = [0, WINDOWHEIGHT-points_text_rect[3]]
+
+        #TODO: implement other placements for the score display
 
         self.screen.blit(points_text, points_cord)
 
