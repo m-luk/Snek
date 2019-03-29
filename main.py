@@ -52,6 +52,7 @@ class App:
         self.snek = snek()
         self.food = food(self.snek)
         self.new_game = False
+        self.sd1 = score_display(self.screen, self.snek)
 
     def on_event(self, event):
         if event.type == pygame.QUIT:       # for quitting
@@ -102,6 +103,8 @@ class App:
             pygame.draw.rect(self.screen, node.get_color(), node.gett())
 
         pygame.draw.rect(self.screen, self.food.get_color(), self.food.gett())
+
+        self.sd1.show_sd()
 
         CLOCK.tick(FPS)
 
