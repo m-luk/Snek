@@ -7,12 +7,20 @@ from random import randint
 
 class App:
     def __init__(self):
+
+        #app params
         self.size = (WINDOWWIDTH, WINDOWHEIGHT)
-        self.run = False
         self.screen = None
-        self.snek = None
-        self.new_game = True
         self.font = FONT_1
+
+        #app objects
+        self.snek = None
+
+        #app states
+        self.run = True
+        self.start_menu = True
+        self.new_game = False
+        self.crash = False
 
     def on_start(self):
         pygame.init()
@@ -23,19 +31,18 @@ class App:
         menu_elements = ["New Game", "Leaderboard", "Credits", "Quit"]
         self.m1 = menu(self.screen, title, menu_elements)
 
-        main_menu=True
-
-        while main_menu:
+        while self.start_menu:
             menu_choice = self.m1.menu_run()
             if menu_choice is not None:
 
                 if menu_choice == -1 or menu_choice == 3:   #quit statement
-                    main_menu = False
                     self.run = False
+                    self.start_menu = False
 
                 if menu_choice==0:      #new game
                     self.run = True
-                    main_menu = False
+                    self.new_game = True
+                    self.start_menu = False
 
                 elif menu_choice==1:    #leaderboard
                     #TODO: leaderboard
@@ -48,10 +55,17 @@ class App:
             self.on_render()
 
     def on_new_game(self):
+        #states
         self.run = True
+        self.new_game = False
+        self.crash = False
+        self.loop = True
+
+        #objects
         self.snek = snek()
         self.food = food(self.snek)
-        self.new_game = False
+
+        #interface
         self.sd1 = score_display(self.screen, self.snek)
 
     def on_event(self, event):
@@ -65,20 +79,21 @@ class App:
     def on_crash(self):
         """handles crashes with obstacles and cannibalism"""
 
-        m2 = menu(self.screen, "You Died", ["RESPAWN", "QUIT"])
+        m2 = menu(self.screen, "You Died", ["RESPAWN", "MAIN MENU", "QUIT"])
 
         menu_run = True
 
-        #TODO: add option to go back to main menu
-
-        while menu_run:
+        while self.crash:
             choice = m2.menu_run()
-            if choice == 0:
+            if choice == 0:             #respawn
                 self.new_game = True
-                menu_run = False
-            elif choice == 1:
+                self.crash= False
+            elif choice == 1:           #main menu
+                self.start_menu = True
+                self.crash= False
+            elif choice == 2:           # quit
                 self.run=False
-                menu_run = False
+                self.crash = False
 
             self.on_render()
 
@@ -99,16 +114,23 @@ class App:
         if self.snek.if_eats(self.food):
             self.food = food(self.snek)
 
+        #draw snek
         for node in self.snek.get_snek():
             pygame.draw.rect(self.screen, node.get_color(), node.gett())
 
+        #draw food
         pygame.draw.rect(self.screen, self.food.get_color(), self.food.gett())
 
+        #if snake crashed
+        if self.snek.is_canibal():
+            self.loop = False
+            self.crash = True
+
+        #show score display
         self.sd1.show_sd()
 
-        CLOCK.tick(FPS)
-
     def on_render(self):
+        CLOCK.tick(FPS)
         pygame.display.flip()
 
     def on_cleanup(self):
@@ -118,19 +140,22 @@ class App:
         if self.on_start() == False:
             self.run = False
 
-        self.on_start_menu()
-
         # game runloop
         while self.run:
 
             for event in pygame.event.get():
                 self.on_event(event)
 
+            if self.start_menu:
+                self.on_start_menu()
+
             if self.new_game:
                 self.on_new_game()
 
-            self.on_loop()
-            if self.snek.is_canibal():
+            if self.loop:
+                self.on_loop()
+
+            if self.crash:
                 self.on_crash()
 
             self.on_render()
