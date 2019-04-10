@@ -15,21 +15,35 @@ class App:
 
         #app objects
         self.snek = None
+        self.food = None
+
+        #ui objects
+        self.m1 = None
+        self.m2 = None
+        self.sd1 = None
 
         #app states
         self.run = True
         self.start_menu = True
         self.new_game = False
         self.crash = False
+        self.loop = False
 
     def on_start(self):
         pygame.init()
         self.screen = pygame.display.set_mode(self.size)
 
+        #setup start menu
+        self.m1 = menu(self.screen, "S N E K", ["New Game", "Leaderboard", "Credits", "Quit"])
+
+        #setup crash menu
+        self.m2 = menu(self.screen, "You Died", ["RESPAWN", "MAIN MENU", "QUIT"])
+
+        return True
+
     def on_start_menu(self):
-        title = "S N E K"
-        menu_elements = ["New Game", "Leaderboard", "Credits", "Quit"]
-        self.m1 = menu(self.screen, title, menu_elements)
+
+        assert self.m1 is not None, "m1 doesn't exist"
 
         while self.start_menu:
             menu_choice = self.m1.menu_run()
@@ -39,7 +53,7 @@ class App:
                     self.run = False
                     self.start_menu = False
 
-                if menu_choice==0:      #new game
+                elif menu_choice==0:      #new game
                     self.run = True
                     self.new_game = True
                     self.start_menu = False
@@ -52,6 +66,7 @@ class App:
                     #TODO: credits
                     pass
 
+            CLOCK.tick(MENU_FPS)
             self.on_render()
 
     def on_new_game(self):
@@ -79,12 +94,10 @@ class App:
     def on_crash(self):
         """handles crashes with obstacles and cannibalism"""
 
-        m2 = menu(self.screen, "You Died", ["RESPAWN", "MAIN MENU", "QUIT"])
-
-        menu_run = True
+        assert self.m2 is not None, "m2 doesn't exist"
 
         while self.crash:
-            choice = m2.menu_run()
+            choice = self.m2.menu_run()
             if choice == 0:             #respawn
                 self.new_game = True
                 self.crash= False
@@ -95,8 +108,8 @@ class App:
                 self.run=False
                 self.crash = False
 
+            CLOCK.tick(MENU_FPS)
             self.on_render()
-
 
     def on_loop(self):
         self.screen.fill(BLACK)
@@ -129,15 +142,16 @@ class App:
         #show score display
         self.sd1.show_sd()
 
-    def on_render(self):
         CLOCK.tick(FPS)
+
+    def on_render(self):
         pygame.display.flip()
 
     def on_cleanup(self):
         pygame.quit()
 
     def on_run(self):
-        if self.on_start() == False:
+        if not self.on_start():
             self.run = False
 
         # game runloop
@@ -149,13 +163,13 @@ class App:
             if self.start_menu:
                 self.on_start_menu()
 
-            if self.new_game:
+            elif self.new_game:
                 self.on_new_game()
 
-            if self.loop:
+            elif self.loop:
                 self.on_loop()
 
-            if self.crash:
+            elif self.crash:
                 self.on_crash()
 
             self.on_render()
