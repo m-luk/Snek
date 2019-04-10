@@ -8,21 +8,21 @@ from random import randint
 class App:
     def __init__(self):
 
-        #app params
+        # app params
         self.size = (WINDOWWIDTH, WINDOWHEIGHT)
         self.screen = None
         self.font = FONT_1
 
-        #app objects
+        # app objects
         self.snek = None
         self.food = None
 
-        #ui objects
+        # ui objects
         self.m1 = None
         self.m2 = None
         self.sd1 = None
 
-        #app states
+        # app states
         self.run = True
         self.start_menu = True
         self.new_game = False
@@ -33,11 +33,11 @@ class App:
         pygame.init()
         self.screen = pygame.display.set_mode(self.size)
 
-        #setup start menu
-        self.m1 = menu(self.screen, "S N E K", ["New Game", "Leaderboard", "Credits", "Quit"])
+        # setup start menu
+        self.m1 = Menu(self.screen, "S N E K", ["New Game", "Leaderboard", "Credits", "Quit"])
 
-        #setup crash menu
-        self.m2 = menu(self.screen, "You Died", ["RESPAWN", "MAIN MENU", "QUIT"])
+        # setup crash menu
+        self.m2 = Menu(self.screen, "You Died", ["RESPAWN", "MAIN MENU", "QUIT"])
 
         return True
 
@@ -49,42 +49,42 @@ class App:
             menu_choice = self.m1.menu_run()
             if menu_choice is not None:
 
-                if menu_choice == -1 or menu_choice == 3:   #quit statement
+                if menu_choice == -1 or menu_choice == 3:  # quit statement
                     self.run = False
                     self.start_menu = False
 
-                elif menu_choice==0:      #new game
+                elif menu_choice == 0:  # new game
                     self.run = True
                     self.new_game = True
                     self.start_menu = False
 
-                elif menu_choice==1:    #leaderboard
-                    #TODO: leaderboard
+                elif menu_choice == 1:  # leaderboard
+                    # TODO: leaderboard
                     pass
 
-                elif menu_choice==2:    #credits
-                    #TODO: credits
+                elif menu_choice == 2:  # credits
+                    # TODO: credits
                     pass
 
             CLOCK.tick(MENU_FPS)
             self.on_render()
 
     def on_new_game(self):
-        #states
+        # states
         self.run = True
         self.new_game = False
         self.crash = False
         self.loop = True
 
-        #objects
-        self.snek = snek()
-        self.food = food(self.snek)
+        # objects
+        self.snek = Snek()
+        self.food = Food(self.snek)
 
-        #interface
-        self.sd1 = score_display(self.screen, self.snek)
+        # interface
+        self.sd1 = ScoreDisplay(self.screen, self.snek)
 
     def on_event(self, event):
-        if event.type == pygame.QUIT:       # for quitting
+        if event.type == pygame.QUIT:  # for quitting
             self.run = False
         elif event.type == pygame.KEYDOWN:  # keyboard shortcut for quitting
             if event.key == pygame.K_q:
@@ -98,14 +98,14 @@ class App:
 
         while self.crash:
             choice = self.m2.menu_run()
-            if choice == 0:             #respawn
+            if choice == 0:  # respawn
                 self.new_game = True
-                self.crash= False
-            elif choice == 1:           #main menu
+                self.crash = False
+            elif choice == 1:  # main menu
                 self.start_menu = True
-                self.crash= False
-            elif choice == 2:           # quit
-                self.run=False
+                self.crash = False
+            elif choice == 2:  # quit
+                self.run = False
                 self.crash = False
 
             CLOCK.tick(MENU_FPS)
@@ -125,21 +125,21 @@ class App:
         self.snek.update_pos()
 
         if self.snek.if_eats(self.food):
-            self.food = food(self.snek)
+            self.food = Food(self.snek)
 
-        #draw snek
+        # draw snek
         for node in self.snek.get_snek():
             pygame.draw.rect(self.screen, node.get_color(), node.gett())
 
-        #draw food
+        # draw food
         pygame.draw.rect(self.screen, self.food.get_color(), self.food.gett())
 
-        #if snake crashed
+        # if snake crashed
         if self.snek.is_canibal():
             self.loop = False
             self.crash = True
 
-        #show score display
+        # show score display
         self.sd1.show_sd()
 
         CLOCK.tick(FPS)
@@ -181,6 +181,3 @@ if __name__ == "__main__":
     a1 = App()
     a1.on_start()
     a1.on_run()
-
-
-

@@ -3,7 +3,7 @@
 # Created by Michal Lukaszewicz (remoteVoyager) at 2019-03-22
 # mlukaszewicz2@gmail.com
 
-#interface script
+# interface script
 import pygame
 from config import *
 from random import randint
@@ -15,12 +15,13 @@ def format_text(msg, font, text_size, text_color):
 
     return new_text
 
-class menu:
+
+class Menu:
     """menu template"""
 
-    def __init__(self, screen, title = None, el_list = None, font = DEF_FONT, title_size=M_TITLE_SIZE, el_size = M_EL_SIZE, \
-                 colors=(MENU_TITLE_COLOR, MENU_INACTIVE_COLOR, MENU_ACTIVE_COLOR), title_spacing = TITLE_SPACING, \
-                 el_spacing = EL_SPACING, default_option=0):
+    def __init__(self, screen, title=None, el_list=None, font=DEF_FONT, title_size=M_TITLE_SIZE, el_size=M_EL_SIZE, \
+                 colors=(MENU_TITLE_COLOR, MENU_INACTIVE_COLOR, MENU_ACTIVE_COLOR), title_spacing=TITLE_SPACING, \
+                 el_spacing=EL_SPACING, default_option=0):
 
         """
         :param colors:
@@ -29,9 +30,9 @@ class menu:
             [2] - menu item active color
         """
 
-        assert title_size<=WINDOWHEIGHT, "Title text to large to be rendered"
-        assert (el_size * len(el_list) + el_spacing * (len(el_list)-1) + title_size + title_spacing) < WINDOWHEIGHT, \
-        "text is too large to render it"
+        assert title_size <= WINDOWHEIGHT, "Title text to large to be rendered"
+        assert (el_size * len(el_list) + el_spacing * (len(el_list) - 1) + title_size + title_spacing) < WINDOWHEIGHT, \
+            "text is too large to render it"
 
         self.screen = screen
 
@@ -60,26 +61,28 @@ class menu:
 
         el_from_top_spacing = self.title_spacing + self.title_size + TITLE_SPACING
 
-        #setup coordinates
+        # setup coordinates
 
-        #TODO: centralise elements vertically
+        # TODO: centralise elements vertically
 
         #   title
         title_cord = (WINDOWWIDTH / 2 - self.title_rect[2] / 2, self.title_spacing)
 
         #   elements
-        el_cords = [(WINDOWWIDTH / 2 - self.el_rects[i][2] / 2, el_from_top_spacing + i * (self.el_rects[i][3] + self.el_spacing)) for i
+        el_cords = [(WINDOWWIDTH / 2 - self.el_rects[i][2] / 2,
+                     el_from_top_spacing + i * (self.el_rects[i][3] + self.el_spacing)) for i
                     in range(len(self.el_list_f))]
 
-        #setup texts
+        # setup texts
         #   title
         self.title_f = format_text(self.title, self.font, self.title_size, self.colors[0])
 
         #   elements
-        self.el_list_f = [format_text(el, self.font, self.el_size, self.colors[1]) for el in self.el_list]              #inactive
-        self.el_list_f[self.option] = format_text(self.el_list[self.option],self.font, self.el_size, self.colors[2])    #active
+        self.el_list_f = [format_text(el, self.font, self.el_size, self.colors[1]) for el in self.el_list]  # inactive
+        self.el_list_f[self.option] = format_text(self.el_list[self.option], self.font, self.el_size,
+                                                  self.colors[2])  # active
 
-        #render
+        # render
         #   title
         self.screen.blit(self.title_f, title_cord)
 
@@ -87,24 +90,23 @@ class menu:
         for el_id in range(len(self.el_list)):
             self.screen.blit(self.el_list_f[el_id], el_cords[el_id])
 
-
     def menu_run(self):
         """Menu item choosing mechanism"""
 
-        #option boundaries
+        # option boundaries
         min_option = 0
-        max_option = len(self.el_list)-1
+        max_option = len(self.el_list) - 1
 
         self.screen.fill(BLACK)
 
         for event in pygame.event.get():
-            #quitting
+            # quitting
             if event.type == pygame.QUIT:
                 return -1
 
-            #menu movement
+            # menu movement
             elif event.type == pygame.KEYDOWN:
-                #move vertically
+                # move vertically
                 if event.key == pygame.K_UP:
                     if self.option > min_option:
                         self.option -= 1
@@ -121,9 +123,9 @@ class menu:
         return None
 
 
-class score_display:
+class ScoreDisplay:
 
-    def __init__(self,screen, snek, placement="top_right", font=S_D_FONT, font_size = S_D_TEXT_SIZE, color = S_D_COLOR):
+    def __init__(self, screen, snek, placement="top_right", font=S_D_FONT, font_size=S_D_TEXT_SIZE, color=S_D_COLOR):
         """
         :param placement:
             top_right
@@ -146,32 +148,29 @@ class score_display:
 
     def show_sd(self):
 
-        #get snek lenght
-        points = len(self.snek)-SNEK_START_SIZE
+        # get snek lenght
+        points = len(self.snek) - SNEK_START_SIZE
 
         points_text = format_text(str(points), self.font, self.font_size, self.color)
 
         points_text_rect = points_text.get_rect()
 
-        points_cord = [0,0]
+        points_cord = [0, 0]
 
-        #set coordinates
+        # set coordinates
         if self.placement == "top_right":
-            points_cord = [WINDOWWIDTH-points_text_rect[2], 0]
+            points_cord = [WINDOWWIDTH - points_text_rect[2], 0]
         elif self.placement == "top_left":
-            points_cord = [0,0]
+            points_cord = [0, 0]
         elif self.placement == "low_right":
-            points_cord = [WINDOWWIDTH-points_text_rect[2], WINDOWHEIGHT-points_text_rect[3]]
-        elif self.placement =="low_left":
-            points_cord = [0, WINDOWHEIGHT-points_text_rect[3]]
+            points_cord = [WINDOWWIDTH - points_text_rect[2], WINDOWHEIGHT - points_text_rect[3]]
+        elif self.placement == "low_left":
+            points_cord = [0, WINDOWHEIGHT - points_text_rect[3]]
 
         self.screen.blit(points_text, points_cord)
 
 
-
-
-
-
-
-
-
+class Scoreboard:
+    #TODO: scoreboard class
+    def __init__(self, scores):
+        pass

@@ -3,14 +3,15 @@
 # Created by Michal Lukaszewicz (remoteVoyager) at 2019-03-22
 # mlukaszewicz2@gmail.com
 
-#Script engine
+# Script engine
 
 import pygame
 from config import *
 from ui import *
 from random import randint, randrange
 
-class position:
+
+class Position:
     def __init__(self, x, y):
         self.x = x
         self.y = y
@@ -38,9 +39,9 @@ class position:
         self.y += vec[1] * multi
 
 
-class square(position):
+class Square(Position):
     def __init__(self, x, y, a, color=None):
-        position.__init__(self, x, y)
+        Position.__init__(self, x, y)
         self.a = a
         self.area = a ** 2
         self.color = color
@@ -55,7 +56,7 @@ class square(position):
         return "square at ({},{})".format(self.x, self.y)
 
 
-class food(square):
+class Food(Square):
     def __init__(self, snek: object):
         loop = True
 
@@ -68,24 +69,24 @@ class food(square):
                     loop = True
                     break
 
-        square.__init__(self, self.x, self.y, SQR_SIZE, WHITE)
-
+        Square.__init__(self, self.x, self.y, SQR_SIZE, WHITE)
 
     def __repr__(self):
         return "food at ({},{})".format(self.x, self.y)
 
 
-class snek:
+class Snek:
     def __init__(self):
         assert (WINDOWHEIGHT % SQR_SIZE == 0 and WINDOWWIDTH % SQR_SIZE == 0)
 
         # body creation
-        self.body = [square(WINDOWWIDTH / 2 - i * SQR_SIZE, WINDOWHEIGHT / 2, SQR_SIZE, GREEN) for i in range(SNEK_START_SIZE)]
+        self.body = [Square(WINDOWWIDTH / 2 - i * SQR_SIZE, WINDOWHEIGHT / 2, SQR_SIZE, GREEN) for i in
+                     range(SNEK_START_SIZE)]
 
         # print([val.get_cord() for val in self.body])
 
-        self.head_cord = self.body[0].get_cord()    # head position
-        self.direction = (1, 0)                     # movement 2d vector
+        self.head_cord = self.body[0].get_cord()  # head position
+        self.direction = (1, 0)  # movement 2d vector
 
     def __len__(self):
         return len(self.body)
@@ -93,7 +94,7 @@ class snek:
     def set_direction(self, vec):
         assert (-1 <= vec[0] <= 1 and -1 <= vec[1] <= 1)
 
-        #dont allow snake running back and forth
+        # dont allow snake running back and forth
         if not vec == tuple([i * (-1) for i in self.direction]):
             self.direction = vec
 
@@ -127,7 +128,7 @@ class snek:
                 if node.get_cord()[1] >= WINDOWHEIGHT:
                     node.set_cord([node.get_cord()[0], 0], False)
                 elif node.get_cord()[1] < 0:
-                    node.set_cord([node.get_cord()[0], WINDOWHEIGHT-SQR_SIZE], False)
+                    node.set_cord([node.get_cord()[0], WINDOWHEIGHT - SQR_SIZE], False)
 
                 self.head_cord = node.get_cord()
 
@@ -146,11 +147,10 @@ class snek:
 
     def if_eats(self, food):
 
-            if food.get_cord() == self.head_cord:
-                pend_node = self.body[-1].get_last_cord()
-                self.body.append(square(pend_node[0], pend_node[1], SQR_SIZE, GREEN))
+        if food.get_cord() == self.head_cord:
+            pend_node = self.body[-1].get_last_cord()
+            self.body.append(Square(pend_node[0], pend_node[1], SQR_SIZE, GREEN))
 
-                return True
-            else:
-                return False
-
+            return True
+        else:
+            return False
