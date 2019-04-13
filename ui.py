@@ -19,8 +19,8 @@ def format_text(msg, font, text_size, text_color):
 class Menu:
     """menu template"""
 
-    def __init__(self, screen, title=None, el_list=None, font=DEF_FONT, title_size=M_TITLE_SIZE, el_size=M_EL_SIZE, \
-                 colors=(MENU_TITLE_COLOR, MENU_INACTIVE_COLOR, MENU_ACTIVE_COLOR), title_spacing=TITLE_SPACING, \
+    def __init__(self, screen, title=None, el_list=None, font=DEF_FONT, title_size=M_TITLE_SIZE, el_size=M_EL_SIZE,
+                 colors=(MENU_TITLE_COLOR, MENU_INACTIVE_COLOR, MENU_ACTIVE_COLOR), title_spacing=TITLE_SPACING,
                  el_spacing=EL_SPACING, default_option=0):
 
         """
@@ -32,7 +32,7 @@ class Menu:
 
         assert title_size <= WINDOWHEIGHT, "Title text to large to be rendered"
         assert (el_size * len(el_list) + el_spacing * (len(el_list) - 1) + title_size + title_spacing) < WINDOWHEIGHT, \
-            "text is too large to render it"
+                "text is too large to render it"
 
         self.screen = screen
 
@@ -56,15 +56,14 @@ class Menu:
 
         self.option = default_option
 
-    def show_menu(self):
+    def show(self):
         """setups and displays menu"""
 
         el_from_top_spacing = self.title_spacing + self.title_size + TITLE_SPACING
 
-        # setup coordinates
-
         # TODO: centralise elements vertically
 
+        # setup coordinates
         #   title
         title_cord = (WINDOWWIDTH / 2 - self.title_rect[2] / 2, self.title_spacing)
 
@@ -90,7 +89,7 @@ class Menu:
         for el_id in range(len(self.el_list)):
             self.screen.blit(self.el_list_f[el_id], el_cords[el_id])
 
-    def menu_run(self):
+    def run(self):
         """Menu item choosing mechanism"""
 
         # option boundaries
@@ -116,7 +115,7 @@ class Menu:
                 elif event.key == pygame.K_RETURN:
                     return self.option
 
-        self.show_menu()
+        self.show()
 
         CLOCK.tick(MENU_FPS)
 
@@ -146,8 +145,7 @@ class ScoreDisplay:
     def change_placement(self, placement):
         self.placement = placement
 
-    def show_sd(self):
-
+    def show(self):
         # get snek lenght
         points = len(self.snek) - SNEK_START_SIZE
 
@@ -170,7 +168,101 @@ class ScoreDisplay:
         self.screen.blit(points_text, points_cord)
 
 
-class Scoreboard:
+class ScoreBoard:
     #TODO: scoreboard class
-    def __init__(self, scores):
-        pass
+    #TODO: preprare tests for scoreboard
+    def __init__(self, screen, scores,  title = "Scoreboard", font = DEF_FONT, title_size = S_B_TITLE_SIZE,
+                 score_size = S_B_SCORE_SIZE, title_spacing = 30, score_spacing = 10):
+        """scores format: [player name, score]"""
+
+        self.screen = screen
+
+        self.scores = ["\t".join(score) for score in scores]
+        self.score_spacing = score_spacing
+        self.score_size = score_size
+
+        self.font = font
+
+        self.color = WHITE
+
+        self.title = title
+        self.title_size = title_size
+        self.title_spacing = title_spacing
+
+        # formatted texts
+        self.scores_f = [format_text(el, self.font, self.score_size, WHITE) for el in self.scores]
+        self.title_f = format_text(self.title, self.font, self.title_size, self.color)
+
+        # text rectangles
+        self.scores_rects = [score.get_rect() for score in self.scores_f]
+        self.title_rect = self.title_f.get_rect()
+
+        #scores movement vars
+        self.cursor_y = 0
+        self.cursor_step = 5
+
+    def __repr__(self):
+        for score in self.scores:
+            print(str(score))
+
+    def setup(self):
+
+        #title coordinates
+        self.title_cord = [(WINDOWWIDTH-self.title_rect[2])/2, self.title_spacing]
+
+        #distance from window border to scores top
+        sts = self.title_spacing * 2 + self.title_size
+
+        #scores coordinates
+        self.scores_cords = ([[(WINDOWWIDTH - self.scores_rects[i][2]) / 2, sts + i * (self.score_size + self.score_spacing)]
+                              for i in range(len(self.scores_rects))])
+
+    def show(self):
+
+        #setup texts
+        self.setup()
+
+        #show title
+        self.screen.blit(self.title_f, self.title_cord)
+
+        #show scores
+        for score_f, score_cord in zip(self.scores_f, self.scores_cords):
+            self.screen.blit(score_f, score_cord)
+
+    def run(self):
+        """Runs ScoreBoard
+            if QUIT or q is pressed returns -1
+            if ENTER is pressed returns 0
+        """
+
+        self.screen.fill(BLACK)
+
+        self.cursor_y = 0
+
+        #events
+        for event in pygame.event.get():
+            if event == pygame.QUIT:
+                return -1
+
+            elif event.type == pygame.KEYDOWN:
+
+                if event.key == pygame.K_q:
+                    return -1
+
+                elif event.key == pygame.K_RETURN:
+                    return 0
+
+                # scores cursor movement
+                elif event.key == pygame.K_DOWN:
+                    self.cursor_y += self.coursor_step
+
+                elif event.key == pygame.K_UP:
+                    self.cursor_y -= self.coursor_step
+
+
+        self.show()
+
+        CLOCK.tick(MENU_FPS)
+
+        return None
+

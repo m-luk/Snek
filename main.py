@@ -46,7 +46,7 @@ class App:
         assert self.m1 is not None, "m1 doesn't exist"
 
         while self.start_menu:
-            menu_choice = self.m1.menu_run()
+            menu_choice = self.m1.run()
             if menu_choice is not None:
 
                 if menu_choice == -1 or menu_choice == 3:  # quit statement
@@ -68,6 +68,12 @@ class App:
 
             CLOCK.tick(MENU_FPS)
             self.on_render()
+
+    def on_leaderboard(self):
+        pass
+
+    def on_credits(self):
+        pass
 
     def on_new_game(self):
         # states
@@ -97,7 +103,7 @@ class App:
         assert self.m2 is not None, "m2 doesn't exist"
 
         while self.crash:
-            choice = self.m2.menu_run()
+            choice = self.m2.run()
             if choice == 0:  # respawn
                 self.new_game = True
                 self.crash = False
@@ -140,7 +146,7 @@ class App:
             self.crash = True
 
         # show score display
-        self.sd1.show_sd()
+        self.sd1.show()
 
         CLOCK.tick(FPS)
 
