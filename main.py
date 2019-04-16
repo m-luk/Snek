@@ -25,6 +25,8 @@ class App:
         # app states
         self.run = True
         self.start_menu = True
+        self.leaderboard = False
+        self.credits = False
         self.new_game = False
         self.crash = False
         self.loop = False
@@ -45,6 +47,12 @@ class App:
 
         assert self.m1 is not None, "m1 doesn't exist"
 
+        self.leaderboard = False
+        self.credits = False
+        self.new_game = False
+        self.crash = False
+        self.loop = False
+
         while self.start_menu:
             menu_choice = self.m1.run()
             if menu_choice is not None:
@@ -59,20 +67,24 @@ class App:
                     self.start_menu = False
 
                 elif menu_choice == 1:  # leaderboard
-                    # TODO: leaderboard
+                    self.leaderboard=True
+                    self.start_menu = False
                     pass
 
                 elif menu_choice == 2:  # credits
-                    # TODO: credits
+                    self.credits = True
+                    self.start_menu = False
                     pass
 
             CLOCK.tick(MENU_FPS)
             self.on_render()
 
     def on_leaderboard(self):
+        # TODO: leaderboard
         pass
 
     def on_credits(self):
+        # TODO: Credits
         pass
 
     def on_new_game(self):
@@ -168,6 +180,12 @@ class App:
 
             if self.start_menu:
                 self.on_start_menu()
+
+            elif self.leaderboard:
+                self.on_leaderboard()
+
+            elif self.credits:
+                self.on_credits()
 
             elif self.new_game:
                 self.on_new_game()

@@ -15,7 +15,6 @@ def format_text(msg, font, text_size, text_color):
 
     return new_text
 
-
 class Menu:
     """menu template"""
 
@@ -167,39 +166,49 @@ class ScoreDisplay:
 
         self.screen.blit(points_text, points_cord)
 
+class Footer:
+    # TODO: class for adding footer notes
+    pass
 
-class ScoreBoard:
+class ScoreBoard(pygame.sprite.Sprite):
     #TODO: scoreboard class
     #TODO: preprare tests for scoreboard
-    def __init__(self, screen, scores,  title = "Scoreboard", font = DEF_FONT, title_size = S_B_TITLE_SIZE,
-                 score_size = S_B_SCORE_SIZE, title_spacing = 30, score_spacing = 10):
+    def __init__(self, screen, scores, top_spacing = 0, score_spacing = 10, cursor_step = 5, font = DEF_FONT,
+                 score_size = S_B_SCORE_SIZE):
         """scores format: [player name, score]"""
+
+        super(ScoreBoard, self).__init__()
 
         self.screen = screen
 
+        # data
         self.scores = ["\t".join(score) for score in scores]
         self.score_spacing = score_spacing
         self.score_size = score_size
+        self.top_spacing = top_spacing
 
+        # scores movement vars
+        self.cursor_y = 0
+        self.cursor_step = cursor_step
+
+        self.move = 0
+        self.movement = {pygame.K_UP: -1,
+                    pygame.K_DOWN: 1}
+
+        # surface
+        self.surf = pygame.Surface((WINDOWWIDTH, WINDOWHEIGHT))
+        self.rect = self.surf.get_rect()
+        self.rect.top = top_spacing
+
+        # resources
         self.font = font
-
         self.color = WHITE
-
-        self.title = title
-        self.title_size = title_size
-        self.title_spacing = title_spacing
 
         # formatted texts
         self.scores_f = [format_text(el, self.font, self.score_size, WHITE) for el in self.scores]
-        self.title_f = format_text(self.title, self.font, self.title_size, self.color)
 
         # text rectangles
         self.scores_rects = [score.get_rect() for score in self.scores_f]
-        self.title_rect = self.title_f.get_rect()
-
-        #scores movement vars
-        self.cursor_y = 0
-        self.cursor_step = 5
 
     def __repr__(self):
         for score in self.scores:
@@ -207,14 +216,8 @@ class ScoreBoard:
 
     def setup(self):
 
-        #title coordinates
-        self.title_cord = [(WINDOWWIDTH-self.title_rect[2])/2, self.title_spacing]
-
-        #distance from window border to scores top
-        sts = self.title_spacing * 2 + self.title_size
-
         #scores coordinates
-        self.scores_cords = ([[(WINDOWWIDTH - self.scores_rects[i][2]) / 2, sts + i * (self.score_size + self.score_spacing)]
+        self.scores_cords = ([[(WINDOWWIDTH - self.scores_rects[i][2]) / 2, i * (self.score_size + self.score_spacing) + self.cursor_y]
                               for i in range(len(self.scores_rects))])
 
     def show(self):
@@ -222,12 +225,11 @@ class ScoreBoard:
         #setup texts
         self.setup()
 
-        #show title
-        self.screen.blit(self.title_f, self.title_cord)
-
         #show scores
         for score_f, score_cord in zip(self.scores_f, self.scores_cords):
-            self.screen.blit(score_f, score_cord)
+            self.surf.blit(score_f, score_cord)
+
+        self.screen.blit(self.surf, (0,self.top_spacing))
 
     def run(self):
         """Runs ScoreBoard
@@ -235,9 +237,7 @@ class ScoreBoard:
             if ENTER is pressed returns 0
         """
 
-        self.screen.fill(BLACK)
-
-        self.cursor_y = 0
+        self.surf.fill(BLACK)
 
         #events
         for event in pygame.event.get():
@@ -245,20 +245,18 @@ class ScoreBoard:
                 return -1
 
             elif event.type == pygame.KEYDOWN:
+                pressed = pygame.key.get_pressed()
 
-                if event.key == pygame.K_q:
+                if pressed[pygame.K_q]:
                     return -1
 
-                elif event.key == pygame.K_RETURN:
-                    return 0
+                self.move = self.movement.get(event.key, self.move)
 
-                # scores cursor movement
-                elif event.key == pygame.K_DOWN:
-                    self.cursor_y += self.coursor_step
+            elif event.type == pygame.KEYUP and event.key in self.movement.keys():
+                self.move = 0
 
-                elif event.key == pygame.K_UP:
-                    self.cursor_y -= self.coursor_step
 
+        self.cursor_y += self.move * self.cursor_step
 
         self.show()
 
