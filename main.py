@@ -142,7 +142,7 @@ class App:
         #show score display
         self.sd1.show_sd()
 
-        CLOCK.tick(FPS)
+        CLOCK.tick(min(FPS + len(self.snek) - SNEK_START_SIZE, 40))
 
     def on_render(self):
         pygame.display.flip()
